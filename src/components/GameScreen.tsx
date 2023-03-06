@@ -1,20 +1,21 @@
 import React, { useState } from "react";
+import { Shop } from "./Shop";
 
-const menu = [
-  { name: "battle", },
-  { name: "inventory", },
-  { name: "map", },
-  { name: "shop", },
+const menu: { name: string }[] = [
+  { name: "battle" },
+  { name: "inventory" },
+  { name: "map" },
+  { name: "shop" },
 ];
 
 const GameScreen = () => {
   const [selectedMenu, setSelectedMenu] = useState("");
 
   const handleMenuClick = (name: string) => {
-    if (name === selectedMenu) return
+    if (name === selectedMenu) return;
 
-    setSelectedMenu(name)
-  }
+    setSelectedMenu(name);
+  };
 
   return (
     <div className="h-screen w-screen bg-slate-300 p-12">
@@ -32,7 +33,7 @@ const GameScreen = () => {
           ))}
         </div>
 
-        <div>{selectedMenu}</div>
+        <div>{selectedMenu === menu[3]?.name && <Shop />}</div>
       </div>
     </div>
   );
