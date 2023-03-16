@@ -28,7 +28,7 @@ const Layout: React.FC<Props> = ({ children }) => {
 };
 
 const Home = () => {
-  const [screen, setScreen] = useState("start");
+  const [screen, setScreen] = useState("game");
 
   const [player, setPlayer] = useState<TPlayer>({
     name: "Lester",

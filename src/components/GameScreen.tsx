@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useLocalStorageState from "use-local-storage-state";
+import Data from "./data/allData.json";
 
 const menu: { name: string }[] = [
   { name: "battle" },
@@ -34,9 +36,19 @@ type TInventory = {
 };
 
 const GameScreen = () => {
-  const [inventory, setInventory] = useState<TInventory>({});
+  /* const [inventory, setLocalInventory] = useState<TInventory>({}); */
   const [selectedMenu, setSelectedMenu] = useState("");
-  const [gold, setGold] = useState(100);
+  const [localInventory, setLocalInventory] =
+    useLocalStorageState<TInventory | null>("inventory");
+  const [localGold, setLocalGold] = useLocalStorageState<number>("gold", {
+    defaultValue: 100,
+  });
+
+  useEffect(() => {
+    if (localInventory) {
+      setLocalInventory(localInventory);
+    }
+  }, [localInventory, setLocalInventory]);
 
   const handleMenuClick = (name: string) => {
     if (name === selectedMenu) return;
@@ -45,9 +57,9 @@ const GameScreen = () => {
   };
 
   const buyItem = (item: TShopItem) => {
-    if (gold < item.price) return;
+    if (localGold < item.price) return;
 
-    const newInventory = { ...inventory };
+    const newInventory = { ...localInventory };
 
     if (item.name in newInventory) {
       // there should be a better way to do this than type assertion
@@ -61,9 +73,13 @@ const GameScreen = () => {
       };
     }
 
-    setGold(gold - item.price);
-    setInventory(newInventory);
+    setLocalGold(localGold - item.price);
+    setLocalInventory(newInventory);
   };
+
+  const getGold = () => setLocalGold(localGold + 10);
+
+  const saveGame = () => setLocalInventory(localInventory);
 
   return (
     <div className="h-screen w-screen bg-slate-300 p-12">
@@ -105,6 +121,13 @@ const GameScreen = () => {
                   </td>
                 </tr>
               ))}
+              {
+                Data.shop.map((item) => (
+                  <tr key={item.itemRef} className="border-b-2">
+                    {/* <td className="px-4 py-2">{Data.items[]}</td> */}
+                  </tr>
+                ))
+              }
             </tbody>
           </table>
         </div>
@@ -112,16 +135,25 @@ const GameScreen = () => {
         <div className="row-span-2">
           <div className="flex place-content-around">
             <h2 className="text-xl ">Inventory</h2>
-            <span>Gold: {gold}</span>
+            <span>Gold: {localGold}</span>
           </div>
           <div>
-            {Object.entries(inventory).map((value, key) => (
-              <div key={key} className="grid grid-cols-2">
-                <div>{value[0]}</div>
-                <div>{value[1].quantity}</div>
-              </div>
-            ))}
+            {localInventory &&
+              Object.keys(localInventory).map((item, idx) => (
+                <div key={idx}>
+                  {item} x {localInventory[item]?.quantity}
+                </div>
+              ))}
           </div>
+        </div>
+
+        <div>
+          <button onClick={saveGame} className="outline p-1">
+            Save
+          </button>
+          <button onClick={getGold} className="outline p-1">
+            +10 Gold
+          </button>
         </div>
       </div>
     </div>
