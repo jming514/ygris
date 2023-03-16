@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import useLocalStorageState from "use-local-storage-state";
 import Data from "./data/allData.json";
+import TestPanel from "./TestPanel";
+import { env } from "../env.mjs";
 
 const menu: { name: string }[] = [
   { name: "battle" },
@@ -35,7 +37,7 @@ type TInventoryItem = {
   };
 };
 
-type TLocalData = {
+export type TLocalData = {
   inventory: TInventoryItem;
   gold: number;
   level: number;
@@ -44,7 +46,7 @@ type TLocalData = {
 };
 
 const GameScreen = () => {
-  const [selectedMenu, setSelectedMenu] = useState("");
+  const [selectedMenu, setSelectedMenu] = useState("character");
   const [localData, setLocalData] = useLocalStorageState<TLocalData>("ygris", {
     defaultValue: {
       level: 1,
@@ -93,19 +95,13 @@ const GameScreen = () => {
     <div className="h-screen w-screen bg-slate-300 p-12">
       <div className="grid grid-cols-3">
         <Menu selectedMenu={selectedMenu} handleMenuClick={handleMenuClick} />
-
-        <Shop buyItem={buyItem} />
+        {
+          selectedMenu === "shop" ? <Shop buyItem={buyItem} /> : null
+        }
 
         <Inventory localData={localData} />
 
-        <div>
-          {/* <button onClick={saveGame} className="outline p-1"> */}
-          {/*   Save */}
-          {/* </button> */}
-          {/* <button onClick={getGold} className="outline p-1"> */}
-          {/*   +10 Gold */}
-          {/* </button> */}
-        </div>
+        {env.NEXT_PUBLIC_NODE_ENV === "development" ? <TestPanel /> : null}
       </div>
     </div>
   );
