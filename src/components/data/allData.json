@@ -1,0 +1,100 @@
+{
+    "monsters": [
+        {
+            "name": "Goblin",
+            "description": "A small, green, and ugly monster.",
+            "hp": 30,
+            "gold": 10,
+            "drops": [
+                {
+                    "name": "HP Potion",
+                    "description": "A potion that restores 10 HP.",
+                    "cost": 10,
+                    "costType": "gold",
+                    "type": "consumable",
+                    "effect": {
+                        "type": "hp",
+                        "amount": 10
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Orc",
+            "description": "A large, green, and ugly monster.",
+            "hp": 60,
+            "gold": 20
+        }
+    ],
+    "spells": [
+        {
+            "name": "Fireball",
+            "description": "A fiery ball of energy that explodes on impact.",
+            "damage": 10,
+            "cost": 10,
+            "costType": "hp",
+            "target": "enemy",
+            "type": "attack",
+            "aoe": false
+        },
+        {
+            "name": "Meteor",
+            "description": "A meteor that falls from the sky and explodes on impact.",
+            "damage": 5,
+            "cost": 10,
+            "costType": "hp",
+            "target": "enemy",
+            "type": "attack",
+            "aoe": true
+        }
+    ],
+    "shop": [
+        {
+            "itemRef": 1,
+            "costType": "gold",
+            "type": "consumable"
+        },
+        {
+            "itemRef": 2,
+            "costType": "gold",
+            "type": "consumable"
+        }
+    ],
+    "items": [
+        {
+            "id": 1,
+            "name": "HP Potion",
+            "description": "A potion that restores 10 HP.",
+            "cost": 10,
+            "costType": "gold",
+            "type": "consumable",
+            "effect": {
+                "type": "hp",
+                "amount": 10
+            }
+        },
+        {
+            "id": 2,
+            "name": "MP Potion",
+            "description": "A potion that restores 15 MP.",
+            "cost": 10,
+            "costType": "gold",
+            "type": "consumable",
+            "effect": {
+                "type": "mp",
+                "amount": 15
+            }
+        },
+        {
+            "id": 3,
+            "name": "Wood Shield",
+            "description": "A basic wooden shield.",
+            "cost": 50,
+            "costType": "gold",
+            "type": "equipment",
+            "effect": {
+                "hp": 10
+            }
+        }
+    ]
+}
