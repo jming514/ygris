@@ -28,27 +28,36 @@ const shopItems: TShopItem[] = [
   },
 ];
 
-type TInventory = {
+type TInventoryItem = {
   [key: string]: {
     id: number;
     quantity: number;
   };
 };
 
+type TLocalData = {
+  inventory: TInventoryItem;
+  gold: number;
+  level: number;
+} & {
+  [key: string]: unknown;
+};
+
 const GameScreen = () => {
-  /* const [inventory, setLocalInventory] = useState<TInventory>({}); */
   const [selectedMenu, setSelectedMenu] = useState("");
-  const [localInventory, setLocalInventory] =
-    useLocalStorageState<TInventory | null>("inventory");
-  const [localGold, setLocalGold] = useLocalStorageState<number>("gold", {
-    defaultValue: 100,
+  const [localData, setLocalData] = useLocalStorageState<TLocalData>("ygris", {
+    defaultValue: {
+      level: 1,
+      gold: 100,
+      inventory: {},
+    },
   });
 
   useEffect(() => {
-    if (localInventory) {
-      setLocalInventory(localInventory);
+    if (!localData) {
+      setLocalData(localData);
     }
-  }, [localInventory, setLocalInventory]);
+  }, [localData, setLocalData]);
 
   const handleMenuClick = (name: string) => {
     if (name === selectedMenu) return;
@@ -57,9 +66,9 @@ const GameScreen = () => {
   };
 
   const buyItem = (item: TShopItem) => {
-    if (localGold < item.price) return;
+    if (localData.gold < item.price) return;
 
-    const newInventory = { ...localInventory };
+    const newInventory = { ...localData.inventory };
 
     if (item.name in newInventory) {
       // there should be a better way to do this than type assertion
@@ -73,89 +82,118 @@ const GameScreen = () => {
       };
     }
 
-    setLocalGold(localGold - item.price);
-    setLocalInventory(newInventory);
+    setLocalData({
+      ...localData,
+      gold: localData.gold - item.price,
+      inventory: newInventory,
+    });
   };
-
-  const getGold = () => setLocalGold(localGold + 10);
-
-  const saveGame = () => setLocalInventory(localInventory);
 
   return (
     <div className="h-screen w-screen bg-slate-300 p-12">
       <div className="grid grid-cols-3">
-        <div className="w-fit rounded border border-solid border-black p-4">
-          {menu.map((item) => (
-            <div key={item.name}>
-              <button
-                className="mb-2 rounded bg-orange-300 px-3 py-2"
-                onClick={() => handleMenuClick(item.name)}
-              >
-                {item.name}
-              </button>
-            </div>
-          ))}
-        </div>
+        <Menu selectedMenu={selectedMenu} handleMenuClick={handleMenuClick} />
+
+        <Shop buyItem={buyItem} />
+
+        <Inventory localData={localData} />
 
         <div>
-          <div>
-            <h2 className="text-xl">SHOP</h2>
-          </div>
-          <table className="table-auto">
-            <thead>
-              <tr className="border-b-4">
-                <th>Item</th>
-                <th>Price</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {shopItems.map((item) => (
-                <tr key={item.id} className="border-b-2">
-                  <td className="px-4 py-2">{item.name}</td>
-                  <td className="px-4 py-2">{item.price}</td>
-                  <td>
-                    <button className="px-4 py-2" onClick={() => buyItem(item)}>
-                      Buy
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {
-                Data.shop.map((item) => (
-                  <tr key={item.itemRef} className="border-b-2">
-                    {/* <td className="px-4 py-2">{Data.items[]}</td> */}
-                  </tr>
-                ))
-              }
-            </tbody>
-          </table>
-        </div>
-
-        <div className="row-span-2">
-          <div className="flex place-content-around">
-            <h2 className="text-xl ">Inventory</h2>
-            <span>Gold: {localGold}</span>
-          </div>
-          <div>
-            {localInventory &&
-              Object.keys(localInventory).map((item, idx) => (
-                <div key={idx}>
-                  {item} x {localInventory[item]?.quantity}
-                </div>
-              ))}
-          </div>
-        </div>
-
-        <div>
-          <button onClick={saveGame} className="outline p-1">
-            Save
-          </button>
-          <button onClick={getGold} className="outline p-1">
-            +10 Gold
-          </button>
+          {/* <button onClick={saveGame} className="outline p-1"> */}
+          {/*   Save */}
+          {/* </button> */}
+          {/* <button onClick={getGold} className="outline p-1"> */}
+          {/*   +10 Gold */}
+          {/* </button> */}
         </div>
       </div>
+    </div>
+  );
+};
+
+type TInventoryProps = {
+  localData: TLocalData;
+};
+
+const Inventory = ({ localData }: TInventoryProps) => {
+  return (
+    <div className="row-span-2">
+      <div className="flex place-content-around">
+        <h2 className="text-xl ">Inventory</h2>
+        <span>Gold: {localData.gold}</span>
+      </div>
+      <div>
+        {localData?.inventory &&
+          Object.keys(localData.inventory).map((item, idx) => (
+            <div key={idx}>
+              {item} x {localData.inventory[item]?.quantity}
+            </div>
+          ))}
+      </div>
+    </div>
+  );
+};
+
+type TShopProps = {
+  buyItem: (item: TShopItem) => void;
+};
+
+const Shop = ({ buyItem }: TShopProps) => {
+  return (
+    <div>
+      <div>
+        <h2 className="text-xl">SHOP</h2>
+      </div>
+      <table className="table-auto">
+        <thead>
+          <tr className="border-b-4">
+            <th>Item</th>
+            <th>Price</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {shopItems.map((item) => (
+            <tr key={item.id} className="border-b-2">
+              <td className="px-4 py-2">{item.name}</td>
+              <td className="px-4 py-2">{item.price}</td>
+              <td>
+                <button className="px-4 py-2" onClick={() => buyItem(item)}>
+                  Buy
+                </button>
+              </td>
+            </tr>
+          ))}
+          {Data.shop.map((item) => (
+            <tr key={item.itemRef} className="border-b-2">
+              {/* <td className="px-4 py-2">{Data.items[]}</td> */}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+type TMenuProps = {
+  selectedMenu: string;
+  handleMenuClick: (name: string) => void;
+};
+
+const Menu = ({ selectedMenu, handleMenuClick }: TMenuProps) => {
+  return (
+    <div className="w-fit rounded border border-solid border-black p-4">
+      {menu.map((item) => (
+        <div key={item.name}>
+          <button
+            className="mb-2 rounded bg-orange-300 px-3 py-2"
+            onClick={() => handleMenuClick(item.name)}
+          >
+            {item.name}
+          </button>
+        </div>
+      ))}
+      <div>{selectedMenu}</div>
     </div>
   );
 };
