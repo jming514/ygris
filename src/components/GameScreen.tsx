@@ -3,6 +3,8 @@ import useLocalStorageState from "use-local-storage-state";
 import Data from "./data/allData.json";
 import TestPanel from "./TestPanel";
 import { env } from "../env.mjs";
+import Map from "./Map";
+import Battle from "./Battle";
 
 const menu: { name: string }[] = [
   { name: "battle" },
@@ -41,16 +43,20 @@ export type TLocalData = {
   inventory: TInventoryItem;
   gold: number;
   level: number;
+  currentHp: number;
+  maxHp: number;
 } & {
   [key: string]: unknown;
 };
 
 const GameScreen = () => {
-  const [selectedMenu, setSelectedMenu] = useState("character");
+  const [selectedMenu, setSelectedMenu] = useState("shop");
   const [localData, setLocalData] = useLocalStorageState<TLocalData>("ygris", {
     defaultValue: {
       level: 1,
       gold: 100,
+      maxHp: 100,
+      currentHp: 100,
       inventory: {},
     },
   });
@@ -91,16 +97,31 @@ const GameScreen = () => {
     });
   };
 
+  const renderScreen = () => {
+    switch (selectedMenu) {
+      case "shop":
+        return (
+          <>
+            <Shop buyItem={buyItem} />
+            <Inventory localData={localData} />
+          </>
+        );
+      case "map":
+        return <Map />;
+      case "battle":
+        return <Battle />;
+      default:
+        return <div>uh oh</div>;
+    }
+  };
+
   return (
     <div className="h-screen w-screen bg-slate-300 p-12">
       <div className="grid grid-cols-3">
         <Menu selectedMenu={selectedMenu} handleMenuClick={handleMenuClick} />
-        {
-          selectedMenu === "shop" ? <Shop buyItem={buyItem} /> : null
-        }
-
-        <Inventory localData={localData} />
-
+        {renderScreen()}
+      </div>
+      <div>
         {env.NEXT_PUBLIC_NODE_ENV === "development" ? <TestPanel /> : null}
       </div>
     </div>

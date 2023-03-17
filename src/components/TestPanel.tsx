@@ -21,7 +21,7 @@ const TestPanel = () => {
   );
 
   return (
-    <div className="m-4 p-4 rounded border-solid border-yellow-900 border-2">
+    <div className="m-4 p-4 rounded border-solid border-blue-700 border-2">
       <h2 className="text-xl mb-2">Testing Panel</h2>
       <Button action={saveGame} text="Save Game" />
 
