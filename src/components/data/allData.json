@@ -5,6 +5,7 @@
             "description": "A small, green, and ugly monster.",
             "hp": 30,
             "gold": 10,
+            "exp": 10,
             "drops": [
                 {
                     "name": "HP Potion",
@@ -23,7 +24,8 @@
             "name": "Orc",
             "description": "A large, green, and ugly monster.",
             "hp": 60,
-            "gold": 20
+            "gold": 20,
+            "exp": 20
         }
     ],
     "spells": [
